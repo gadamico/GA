@@ -55,8 +55,11 @@ Error <- mean(na.omit(fittingResults != test$statusAsInt))
 Error
 
 library(rpart)
-rpart(statusAsInt ~ goal + duration, data = train,
+goalTree <- rpart(statusAsInt ~ goal + duration, data = train,
       method = "class")
+
+library(maptree)
+draw.tree(goalTree, cex = 0.7)
 
 ## This tree predicts that a campaign will typically
 ## be unsuccessful if the goal >= 8082 and will typically
@@ -78,6 +81,43 @@ model3 <- lm(statusAsInt ~ categoryArt + categoryComics
              + categoryMusic + categoryPhotography + categoryPublishing
              + categoryTechnology+ categoryTheater, data = DSIplusDums)
 summary(model3)
+
+ArtSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryArt == 1,]$statusAsInt)) / sum(DSIplusDums$categoryArt)
+ComicsSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryComics == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryComics)
+DanceSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryDance == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryDance)
+DesignSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryDesign == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryDesign)
+FashionSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryFashion == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryFashion)
+FilmSucc <- sum(na.omit(DSIplusDums[DSIplusDums$`categoryFilm & Video` == 1,]$statusAsInt)) /
+  sum(DSIplusDums$`categoryFilm & Video`)
+FoodSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryFood == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryFood)
+GamesSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryGames == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryGames)
+MusicSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryMusic == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryMusic)
+PhotoSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryPhotography == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryPhotography)
+PubSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryPublishing == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryPublishing)
+TechSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryTechnology == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryTechnology)
+TheatSucc <- sum(na.omit(DSIplusDums[DSIplusDums$categoryTheater == 1,]$statusAsInt)) /
+  sum(DSIplusDums$categoryTheater)
+
+Succ <- c(ArtSucc, ComicsSucc, DanceSucc, DesignSucc, FashionSucc,
+          FilmSucc, FoodSucc, GamesSucc, MusicSucc, PhotoSucc,
+          PubSucc, TechSucc, TheatSucc)
+
+x <- c("Art", "Com", "Dan", "Des", "Fash", "Film", "Food",
+       "Game", "Mus", "Phot", "Pub", "Tech", "Thea")
+cats <- as.data.frame(cbind(x, Succ))
+
+ggplot(cats, aes(x = x, y = Succ)) + geom_point()
+      + theme(axis.text.x = element_text(angle = 90))
 
 
 library(tidyr)
